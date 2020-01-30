@@ -1,3 +1,4 @@
+import { Appear, Split } from 'mdx-deck';
 import {
   CodeSurfer,
   CodeSurferColumns,
@@ -7,140 +8,273 @@ import { github, vsDark } from "@code-surfer/themes";
 
 export const theme = vsDark;
 
-# Hello 👋
+# Type Erasure
 
-You are using [MDX Deck](https://github.com/jxnblk/mdx-deck) and [Code Surfer](https://codesurfer.pomb.us)
+## What is important to understand
+
+  Lesley Lai
+
+- [lesleylai.info](https://lesleylai.info/)
+- [@LesleyLai6](https://twitter.com/LesleyLai6)
+
+---
+
+# About me
+- Computer Science and Applied Math undergrad
+- SketchUp Intern
+- Computer Graphics Person
+
+---
+
+# What is Type Erasure
+Two different usages of the word
+
+<ul>
+  <Appear>
+    <li>Compilers erasing static type information before runtime</li>
+    <li>In Generic Programming, programmers circumvent static type-system to achieve dynamic polymorphism</li>
+  </Appear>
+</ul>
+
+---
+
+# Compilers erasing static type information before runtime
+<iframe width="800px" height="400px" src="https://godbolt.org/e?readOnly=true#g:!((g:!((g:!((g:!((h:codeEditor,i:(fontScale:14,j:1,lang:c%2B%2B,selection:(endColumn:2,endLineNumber:9,positionColumn:2,positionLineNumber:9,selectionStartColumn:1,selectionStartLineNumber:9,startColumn:1,startLineNumber:9),source:'%23include+%3Ccstdlib%3E%0A%0Astd::size_t+f()+%7B%0A++++return+0%3B%0A%7D%0A%0Avoid*+g()+%7B%0A++++return+nullptr%3B%0A%7D'),l:'5',n:'0',o:'C%2B%2B+source+%231',t:'0')),k:50,l:'4',n:'0',o:'',s:0,t:'0'),(g:!((h:compiler,i:(compiler:g91,filters:(b:'0',binary:'1',commentOnly:'0',demangle:'0',directives:'0',execute:'1',intel:'0',libraryCode:'1',trim:'1'),fontScale:14,j:1,lang:c%2B%2B,libs:!(),options:'-O2',selection:(endColumn:1,endLineNumber:1,positionColumn:1,positionLineNumber:1,selectionStartColumn:1,selectionStartLineNumber:1,startColumn:1,startLineNumber:1),source:1),l:'5',n:'0',o:'x86-64+gcc+9.1+(Editor+%231,+Compiler+%231)+C%2B%2B',t:'0')),k:50,l:'4',n:'0',o:'',s:0,t:'0')),l:'2',m:82.84518828451883,n:'0',o:'',t:'0'),(g:!((h:output,i:(compiler:1,editor:1,fontScale:14,wrap:'1'),l:'5',n:'0',o:'%231+with+x86-64+gcc+9.1',t:'0')),header:(),l:'4',m:17.154811715481166,n:'0',o:'',s:0,t:'0')),l:'3',n:'0',o:'',t:'0')),version:4"></iframe>
+
+---
+
+# Compilers erasing static type information before runtime
+
+Not our focus today
+
+---
+
+# Method to achieve polymorphism
+TODO
+
+---
+
+# "C-Style" type erasure
+- Cast
+- Fast
+- Lost *all* type information
+- Not type safe
 
 ---
 
 <CodeSurfer>
 
-```js title="This is a title" subtitle="and this a subtitle"
-function lorem(ipsum, dolor = 1) {
-  const sit = ipsum == null ? 0 : ipsum.sit;
-  dolor = sit - amet(dolor);
-  return sit
-    ? consectetur(ipsum, 0, dolor < 0 ? 0 : dolor)
-    : [];
-}
+```cpp title="Example: \"User Pointer\""
+void glfwSetWindowUserPointer(GLFWwindow* window, void* pointer);
 
-function incididunt(ipsum, ut = 1) {
-  ut = labore.et(amet(ut), 0);
-  const sit = ipsum == null ? 0 : ipsum.sit;
+void* glfwGetWindowUserPointer(GLFWwindow* window);
+```
 
-  if (!sit || ut < 1) {
-    return [];
+```diff 1[50:55],3[1:5] title="Example: \"User Pointer\"" subtitle="notice the void*"
+```
+
+```cpp title="Example: \"User Pointer\"" subtitle="Usage"
+class App {
+  App() {
+    // ...
+    glfwSetWindowUserPointer(window_, this);
   }
 
-  let dolore = 0;
-  let magna = 0;
-  const aliqua = new eiusmod(labore.ut(sit / ut));
+// ...
 
-  while (dolore < sit) {
-    aliqua[magna++] = consectetur(
-      ipsum,
-      dolore,
-      (dolore += ut)
-    );
-  }
+private:
+  GLFWwindow* window_ = nullptr;
+  // ...
+};
 
-  return aliqua;
+void process_input(GLFWwindow* window)
+{
+  auto* app_ptr = static_cast<App*>(
+      glfwGetWindowUserPointer(window));
+  // ...
 }
 ```
 
-```js
-function lorem(ipsum, dolor = 1) {
-  const sit = ipsum == null ? 0 : ipsum.sit;
-  dolor = sit - amet(dolor);
-  return sit
-    ? consectetur(ipsum, 0, dolor < 0 ? 0 : dolor)
-    : [];
-}
-
-function adipiscing(...elit) {
-  if (!elit.sit) {
-    return [];
-  }
-
-  const sed = elit[0];
-  return eiusmod.tempor(sed) ? sed : [sed];
-}
-
-function incididunt(ipsum, ut = 1) {
-  ut = labore.et(amet(ut), 0);
-  const sit = ipsum == null ? 0 : ipsum.sit;
-
-  if (!sit || ut < 1) {
-    return [];
-  }
-
-  let dolore = 0;
-  let magna = 0;
-  const aliqua = new eiusmod(labore.ut(sit / ut));
-
-  while (dolore < sit) {
-    aliqua[magna++] = consectetur(
-      ipsum,
-      dolore,
-      (dolore += ut)
-    );
-  }
-
-  return aliqua;
-}
+``` diff 16[18:36] title="Example: \"User Pointer\"" subtitle="Need to static_cast back to original type"
 ```
 
-```diff 1[10:14],2[15:19],3[22:27],10:12
-
+```cpp title="Example: \"User Pointer\"" subtitle="Use Abstraction to hide the ugliness"
+TODO
 ```
 
 </CodeSurfer>
 
 ---
 
-<CodeSurferColumns themes={[vsDark, github]}>
+# Inheritance with Virtual Dispatch
+
+---
+
+<CodeSurfer>
+
+```cpp title="A ray tracing example"
+struct Hitable {
+  virtual ~Hitable() = default;
+
+  virtual auto bounding_box() const
+  -> std::optional<AABB> = 0;
+
+  virtual auto intersect
+  (const Ray& r,float t_min, float t_max) const
+  -> std::optional<HitRecord> = 0;
+};
+```
+
+```diff 2[2:20],4[2:9,15:29],5[25:28],7[2:9,15:24],9[30:33] title="A ray tracing example" subtitle="Affordance: destructor, bounding_box, intersect"
+```
+
+```cpp title="A ray tracing example" subtitle="Make clang-tidy happy"
+struct Hitable {
+  Hitable() = default;
+  virtual ~Hitable() = default;
+  Hitable(const Hitable&) = delete;
+  auto operator=(const Hitable&) & -> Hitable& = delete;
+  Hitable(Hitable&&) noexcept = delete;
+  auto operator=(Hitable&&) & noexcept -> Hitable& = delete;
+
+  virtual auto bounding_box() const
+  -> std::optional<AABB> = 0;
+
+  virtual auto intersect
+  (const Ray& r,float t_min, float t_max) const
+  -> std::optional<HitRecord> = 0;
+};
+```
+
+```cpp title="A ray tracing example" subtitle="Sphere"
+struct Sphere : Hitable {
+  Point3f center{};
+  float radius = 1;
+  const Material* material = nullptr;
+
+  // Constructor
+
+  auto bounding_box() const
+  -> std::optional<AABB> override;
+
+  auto intersect(const Ray& r,float t_min, float t_max) const
+  -> std::optional<HitRecord> override;
+};
+```
+
+```cpp title="A ray tracing example" subtitle="Triangle"
+struct Triangle : Hitable {
+  Point3f a{}, b{}, c{};
+  const Material* material = nullptr;
+
+  // Constructor
+
+  auto bounding_box() const
+  -> std::optional<AABB> override;
+
+  auto intersect(const Ray& r,float t_min, float t_max) const
+  -> std::optional<HitRecord> override;
+};
+```
+
+```cpp title="A ray tracing example" subtitle="BVH node"
+class BVHnode : public Hitable {
+private:
+  std::unique_ptr<const Hitable> left_ = nullptr;
+  std::unique_ptr<const Hitable> right_ = nullptr;
+  AABB box_;
+
+public:
+  // Constructor
+
+  auto bounding_box() const
+  -> std::optional<AABB> override;
+
+  auto intersect(const Ray& r,float t_min, float t_max) const
+  -> std::optional<HitRecord> override;
+};
+```
+
+```cpp title="A ray tracing example" subtitle="Transformed BVH node"
+class TransformedBVHnode : public BVHnode {
+private:
+  Mat4 transform_;
+  Mat4 inverse_transform_;
+
+public:
+  // Constructor
+
+  auto bounding_box() const
+  -> std::optional<AABB> override;
+
+  auto intersect(const Ray& r,float t_min, float t_max) const
+  -> std::optional<HitRecord> override;
+};
+```
+
+</CodeSurfer>
+
+---
+
+# Inheritance with Virtual Dispatch
+
+
+<CodeSurferColumns>
 
 <Step>
 
-```js
-const magna = aliqua => aliqua.ut((enim, ad) => enim, 0);
-```
+<div>
+  <h3>Advantages</h3>
+  <ul>
+    <li>Idiomatic</li>
+    <li>Code reuse with open recursion</li>
+  </ul>
+</div>
 
-```js
-const minim = (ad, enim) => dolore.magna(ad / enim);
-```
+<div>
+  <h3>Disadvantage</h3>
+  <p>I hate the <code>virtual</code> keyword!</p>
+</div>
 
 </Step>
 
 <Step>
 
-```js
-const lorem = (ipsum, dolor, sit) => {
-  const amet = dolor - ipsum;
-  return consectetur.adipiscing(
-    {
-      elit: sed.eiusmod(sit - dolor) / amet + 2,
-    },
-    (tempor, incididunt) => ipsum + amet * incididunt
-  );
-};
+<div>
+  <h3>Advantages</h3>
+  <ul>
+    <li>Idiomatic</li>
+    <li>Code reuse with open recursion</li>
+  </ul>
+</div>
 
-const magna = aliqua => aliqua.ut((enim, ad) => enim, 0);
-```
+<div>
+  <h3>Disadvantage</h3>
+  <p><strike>I hate the <code>virtual</code> keyword!</strike></p>
+</div>
 
-```js
-const minim = (ad, enim) => dolore.magna(ad / enim);
+</Step>
 
-const sed = (eiusmod, tempor, incididunt) => {
-  const ut = tempor - eiusmod;
-  return labore.et(
-    {
-      amet: dolore.magna(incididunt - tempor) / ut + 2,
-    },
-    (aliqua, elit) => eiusmod + ut * elit
-  );
-};
-```
+<Step>
+
+<div>
+  <h3>Advantages</h3>
+  <ul>
+    <li>Idiomatic</li>
+    <li>Code reuse with open recursion</li>
+  </ul>
+</div>
+
+<div>
+  <h3>Disadvantage</h3>
+  <ul>
+    <li>Intrusive</li>
+    <li>Reference Semantics</li>
+    <li>No small buffer optimization</li>
+    <li>Coupled with dynamic allocation and explicit memory management</li>
+    <li>Murdering inlining</li>
+  </ul>
+</div>
 
 </Step>
 
@@ -148,5 +282,158 @@ const sed = (eiusmod, tempor, incididunt) => {
 
 ---
 
-docs:  
-[codesurfer.pomb.us](https://codesurfer.pomb.us)
+# Structure typing
+- *"type compatibility and equivalence are determined by the type's actual structure or definition"*
+- "Concept Checking"
+- Same idea: Ocaml row polymorphism, go Interface, typescript interface, swift protocal, ...
+- Related but intrusive: Rust trait, Haskell type class
+
+---
+
+# Talks that propose using structure typing instead of inheritance
+- [Better Code: Runtime Polymorphism - Sean Parent](https://www.youtube.com/watch?v=QGcVXgEVMJg&feature=youtu.be)
+- [Simon Brand: "How Rust gets polymorphism right"](https://www.youtube.com/watch?v=VSlBhAOLtFA)
+- [CppCon 2017: Louis Dionne “Runtime Polymorphism: Back to the Basics”](https://www.youtube.com/watch?v=gVGtNFg4ay0)
+- [Mathieu Ropert: Polymorphic ducks](https://mropert.github.io/2017/11/30/polymorphic_ducks/)
+- [CppCon 2019: John Bandela “Polymorphism != Virtual: Easy, Flexible Runtime Polymorphism Without Inheritance”](https://www.youtube.com/watch?v=PSxo85L2lC0&list=PLHTh1InhhwT6KhvViwRiTR7I5s09dLCSw&index=115&t=0s)
+---
+
+<CodeSurfer>
+
+```cpp title="Structure typing" subtitle="C++ Concept"
+template<typename T>
+concept Hitable = requires(T s) {
+    { s.bounding_box() } -> std::same_as<AABB>;
+
+    requires requires(const Ray& r,
+                      float t_min, float t_max) {
+        { s.intersect(r, t_min, t_max) }
+          -> std::same_as<std::optional<HitRecord>>;
+    };
+};
+```
+
+```cpp 2[1:7] title="Structure typing" subtitle="Not real C++"
+template<typename T>
+virtual concept Hitable = requires(T s) {
+    { s.bounding_box() } -> std::same_as<AABB>;
+
+    requires requires(const Ray& r,
+                      float t_min, float t_max) {
+        { s.intersect(r, t_min, t_max) }
+          -> std::same_as<std::optional<HitRecord>>;
+    };
+};
+```
+
+</CodeSurfer>
+
+---
+
+# Affordance of `Shape`
+- Destory
+- `bounding_box`
+- `intersect`
+
+---
+
+# Structure Typing In the Standard Library
+- `std::any`
+- `std::function`
+- `std::shared_ptr`
+
+---
+
+# `std::any`
+- Is **not** a "safe replacement for `void*`"
+  - Owner vs non-owner
+  - "Type safety" cost
+
+---
+
+# `std::any` affordance
+- Copy
+- Move
+- Destory
+- RTTI (`type`, `any_cast`)
+
+---
+
+<CodeSurfer>
+
+```cpp title="Why we need std::function?" subtitle="Lambda in C++"
+class Lambda {
+  auto operator()(double a, double b) -> void {
+    return (std::abs(a) < std::abs(b));
+  }
+};
+```
+
+``` cpp title="Why we need std::function?" subtitle="Lambda in some languages"
+class SadLambda : Function<bool<double, double>> {
+  auto operator()(double a, double b) const -> bool override {
+    return (a < b);
+  }
+};
+```
+
+```diff 1[18:48],2[52:60] title="Why we need std::function?" subtitle="Those language already perform type erasure for you"
+
+```
+
+</CodeSurfer>
+
+---
+
+# `std::function` affordance
+- Copy
+- Move
+- Invoke
+- Destory
+- RTTI (`target_type`)
+
+---
+
+# `unique_function`: A better `function`
+- [P0228R3 "`unique_function`: a move-only std::function"](https://wg21.link/p0228)
+- Don't require functions to be copyable
+- Fix the [`const`-correctness bug](https://lesleylai.info/en/const-correcness-std-function/) in `std::function`
+
+---
+
+# `unique_function` affordance
+- ~~Copy~~
+- Move
+- Invoke
+- Destory
+- ~~RTTI~~
+
+---
+
+# Implementing `unique_function`
+Finally, some real code!
+
+---
+
+# General purpose libraries for type erasure
+
+* [Adobe.Poly](http://stlab.adobe.com/group__poly__related.html)
+* [Boost.TypeErasure](https://www.boost.org/doc/libs/1_66_0/doc/html/boost_typeerasure.html)
+* [Folly.Poly](https://github.com/facebook/folly/blob/master/folly/docs/Poly.md)
+* [Dyno](https://github.com/ldionne/dyno)
+* [polymorphic.hpp](https://github.com/google/cpp-from-the-sky-down/blob/master/metaprogrammed_polymorphism/polymorphic.hpp)
+* [\[Boost\].TE](https://github.com/boost-experimental/te)
+
+---
+
+# Things to consider before picking a library
+* Are they actively maintained?
+* value vs reference semantics
+* SBO
+
+---
+
+# Thank you!
+
+contacts:  
+[lesley@lesleylai.info](mailto:lesley@lesleylai.info)
