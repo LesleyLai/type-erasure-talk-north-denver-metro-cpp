@@ -1,6 +1,6 @@
 # Type Erasure Talk
 
-This is the type erasure talk I gave at [North Denver Metro C++ Meetup](https://www.meetup.com/North-Denver-Metro-C-Meetup/events/268018410/). You can view the deployed slides on [netlify](type-erasure-talk-north-denver-metro-cpp.netlify.com/).
+This is the type erasure talk I gave at [North Denver Metro C++ Meetup](https://www.meetup.com/North-Denver-Metro-C-Meetup/events/268018410/). You can view the deployed slides on [netlify](https://type-erasure-talk-north-denver-metro-cpp.netlify.com/).
 
 ## Development
 
