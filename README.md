@@ -1,6 +1,6 @@
-# MDX Deck + Code Surfer template
+# Type Erasure Talk
 
-This project was generated with the `npm init code-surfer-deck` command.
+This is the type erasure talk I gave at [North Denver Metro C++ Meetup](https://www.meetup.com/North-Denver-Metro-C-Meetup/events/268018410/).
 
 ## Development
 
