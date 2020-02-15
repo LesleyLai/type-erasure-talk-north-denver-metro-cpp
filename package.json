@@ -10,5 +10,8 @@
     "code-surfer": "3.0.0",
     "mdx-deck": "3.0.13"
   },
-  "name": "type-erasure"
+  "name": "type-erasure",
+  "dependencies": {
+    "graphviz-react": "^1.0.4"
+  }
 }

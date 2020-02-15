@@ -1,16 +1,19 @@
-import { Appear, Split } from 'mdx-deck';
+import { Appear, Split, Image } from 'mdx-deck';
 import {
   CodeSurfer,
   CodeSurferColumns,
   Step,
 } from "code-surfer";
-import { github, vsDark } from "@code-surfer/themes";
 
-export const theme = vsDark;
+import customTheme from "./src/customTheme";
+
+import evil from "./evil.png"
+
+export const theme = customTheme;
 
 # Type Erasure
 
-## What is important to understand
+## concept and implementation
 
   Lesley Lai
 
@@ -20,13 +23,30 @@ export const theme = vsDark;
 ---
 
 # About me
+
 - Computer Science and Applied Math undergrad
 - SketchUp Intern
 - Computer Graphics Person
 
 ---
 
+# About the slides
+
+- Build with [mdx-deck](https://github.com/jxnblk/mdx-deck) and [code-surfer](https://github.com/pomber/code-surfer)
+- `Alt-O` Overview mode
+- `Alt-G` Grid mode
+
+---
+
+# About the talk
+
+- [Arthur O’Dwyer](https://quuxplusone.github.io/blog/) taught me a lot of the implementation techniques
+- Errors are mine
+
+---
+
 # What is Type Erasure
+
 Two different usages of the word
 
 <ul>
@@ -39,7 +59,8 @@ Two different usages of the word
 ---
 
 # Compilers erasing static type information before runtime
-<iframe width="800px" height="400px" src="https://godbolt.org/e?readOnly=true#g:!((g:!((g:!((g:!((h:codeEditor,i:(fontScale:14,j:1,lang:c%2B%2B,selection:(endColumn:2,endLineNumber:9,positionColumn:2,positionLineNumber:9,selectionStartColumn:1,selectionStartLineNumber:9,startColumn:1,startLineNumber:9),source:'%23include+%3Ccstdlib%3E%0A%0Astd::size_t+f()+%7B%0A++++return+0%3B%0A%7D%0A%0Avoid*+g()+%7B%0A++++return+nullptr%3B%0A%7D'),l:'5',n:'0',o:'C%2B%2B+source+%231',t:'0')),k:50,l:'4',n:'0',o:'',s:0,t:'0'),(g:!((h:compiler,i:(compiler:g91,filters:(b:'0',binary:'1',commentOnly:'0',demangle:'0',directives:'0',execute:'1',intel:'0',libraryCode:'1',trim:'1'),fontScale:14,j:1,lang:c%2B%2B,libs:!(),options:'-O2',selection:(endColumn:1,endLineNumber:1,positionColumn:1,positionLineNumber:1,selectionStartColumn:1,selectionStartLineNumber:1,startColumn:1,startLineNumber:1),source:1),l:'5',n:'0',o:'x86-64+gcc+9.1+(Editor+%231,+Compiler+%231)+C%2B%2B',t:'0')),k:50,l:'4',n:'0',o:'',s:0,t:'0')),l:'2',m:82.84518828451883,n:'0',o:'',t:'0'),(g:!((h:output,i:(compiler:1,editor:1,fontScale:14,wrap:'1'),l:'5',n:'0',o:'%231+with+x86-64+gcc+9.1',t:'0')),header:(),l:'4',m:17.154811715481166,n:'0',o:'',s:0,t:'0')),l:'3',n:'0',o:'',t:'0')),version:4"></iframe>
+
+<iframe width="800px" height="350px" src="https://godbolt.org/e?readOnly=true#g:!((g:!((g:!((g:!((h:codeEditor,i:(fontScale:14,j:1,lang:c%2B%2B,selection:(endColumn:2,endLineNumber:9,positionColumn:2,positionLineNumber:9,selectionStartColumn:1,selectionStartLineNumber:9,startColumn:1,startLineNumber:9),source:'%23include+%3Ccstdlib%3E%0A%0Astd::size_t+f()+%7B%0A++++return+0%3B%0A%7D%0A%0Avoid*+g()+%7B%0A++++return+nullptr%3B%0A%7D'),l:'5',n:'0',o:'C%2B%2B+source+%231',t:'0')),k:50,l:'4',n:'0',o:'',s:0,t:'0'),(g:!((h:compiler,i:(compiler:g91,filters:(b:'0',binary:'1',commentOnly:'0',demangle:'0',directives:'0',execute:'1',intel:'0',libraryCode:'1',trim:'1'),fontScale:14,j:1,lang:c%2B%2B,libs:!(),options:'-O2',selection:(endColumn:1,endLineNumber:1,positionColumn:1,positionLineNumber:1,selectionStartColumn:1,selectionStartLineNumber:1,startColumn:1,startLineNumber:1),source:1),l:'5',n:'0',o:'x86-64+gcc+9.1+(Editor+%231,+Compiler+%231)+C%2B%2B',t:'0')),k:50,l:'4',n:'0',o:'',s:0,t:'0')),l:'2',m:82.84518828451883,n:'0',o:'',t:'0'),(g:!((h:output,i:(compiler:1,editor:1,fontScale:14,wrap:'1'),l:'5',n:'0',o:'%231+with+x86-64+gcc+9.1',t:'0')),header:(),l:'4',m:17.154811715481166,n:'0',o:'',s:0,t:'0')),l:'3',n:'0',o:'',t:'0')),version:4"></iframe>
 
 ---
 
@@ -49,12 +70,20 @@ Not our focus today
 
 ---
 
-# Method to achieve polymorphism
-TODO
+# We will talk about type erasure as a method to achieve dynamic polymorphism
+
+---
+
+# Type erasure techniques
+
+- "C-style" type erausre
+- Virtual dispatch
+- Structural typing
 
 ---
 
 # "C-Style" type erasure
+
 - Cast
 - Fast
 - Lost *all* type information
@@ -98,10 +127,6 @@ void process_input(GLFWwindow* window)
 ``` diff 16[18:36] title="Example: \"User Pointer\"" subtitle="Need to static_cast back to original type"
 ```
 
-```cpp title="Example: \"User Pointer\"" subtitle="Use Abstraction to hide the ugliness"
-TODO
-```
-
 </CodeSurfer>
 
 ---
@@ -125,7 +150,7 @@ struct Hitable {
 };
 ```
 
-```diff 2[2:20],4[2:9,15:29],5[25:28],7[2:9,15:24],9[30:33] title="A ray tracing example" subtitle="Affordance: destructor, bounding_box, intersect"
+```diff 2[2:20],4[2:9,15:29],5[25:28],7[2:9,15:24],9[30:33] title="A ray tracing example"
 ```
 
 ```cpp title="A ray tracing example" subtitle="Make clang-tidy happy"
@@ -147,9 +172,8 @@ struct Hitable {
 ```
 
 ```cpp title="A ray tracing example" subtitle="Sphere"
-struct Sphere : Hitable {
-  Point3f center{};
-  float radius = 1;
+struct SpherePrimitive : Hitable {
+  Sphere s;
   const Material* material = nullptr;
 
   // Constructor
@@ -163,8 +187,8 @@ struct Sphere : Hitable {
 ```
 
 ```cpp title="A ray tracing example" subtitle="Triangle"
-struct Triangle : Hitable {
-  Point3f a{}, b{}, c{};
+struct TrianglePrimitive : Hitable {
+  Triangle t;
   const Material* material = nullptr;
 
   // Constructor
@@ -177,29 +201,12 @@ struct Triangle : Hitable {
 };
 ```
 
-```cpp title="A ray tracing example" subtitle="BVH node"
+```cpp 1:5 title="A ray tracing example" subtitle="BVH node"
 class BVHnode : public Hitable {
 private:
   std::unique_ptr<const Hitable> left_ = nullptr;
   std::unique_ptr<const Hitable> right_ = nullptr;
-  AABB box_;
-
-public:
-  // Constructor
-
-  auto bounding_box() const
-  -> std::optional<AABB> override;
-
-  auto intersect(const Ray& r,float t_min, float t_max) const
-  -> std::optional<HitRecord> override;
-};
-```
-
-```cpp title="A ray tracing example" subtitle="Transformed BVH node"
-class TransformedBVHnode : public BVHnode {
-private:
-  Mat4 transform_;
-  Mat4 inverse_transform_;
+  AABB aabb_cache_;
 
 public:
   // Constructor
@@ -216,8 +223,13 @@ public:
 
 ---
 
-# Inheritance with Virtual Dispatch
+# Virtual Dispatch in the Standard Library
 
+- `std::pmr::memory_resource`
+
+---
+
+# Virtual Dispatch pros and cons
 
 <CodeSurferColumns>
 
@@ -233,7 +245,7 @@ public:
 
 <div>
   <h3>Disadvantage</h3>
-  <p>I hate the <code>virtual</code> keyword!</p>
+  <p><i>Sean Parent</i> hates the <code>virtual</code> keyword!</p>
 </div>
 
 </Step>
@@ -250,7 +262,24 @@ public:
 
 <div>
   <h3>Disadvantage</h3>
-  <p><strike>I hate the <code>virtual</code> keyword!</strike></p>
+  <img src={evil} />
+</div>
+
+</Step>
+
+<Step>
+
+<div>
+  <h3>Advantages</h3>
+  <ul>
+    <li>Idiomatic</li>
+    <li>Code reuse with open recursion</li>
+  </ul>
+</div>
+
+<div>
+  <h3>Disadvantage</h3>
+  <p><strike><i>Sean Parent</i> hates the <code>virtual</code> keyword!</strike></p>
 </div>
 
 </Step>
@@ -270,7 +299,6 @@ public:
   <ul>
     <li>Intrusive</li>
     <li>Reference Semantics</li>
-    <li>No small buffer optimization</li>
     <li>Coupled with dynamic allocation and explicit memory management</li>
     <li>Murdering inlining</li>
   </ul>
@@ -282,25 +310,33 @@ public:
 
 ---
 
-# Structure typing
+# Structural typing
+
 - *"type compatibility and equivalence are determined by the type's actual structure or definition"*
 - "Concept Checking"
-- Same idea: Ocaml row polymorphism, go Interface, typescript interface, swift protocal, ...
-- Related but intrusive: Rust trait, Haskell type class
+- Same idea: Go Interface, Typescript interface, Ocaml row polymorphism ...
+- Related but intrusive: Rust trait, Haskell type class, Swift protocol, SML/Ocaml module signature
 
 ---
 
-# Talks that propose using structure typing instead of inheritance
+# Terminology: Affordance
+
+> **Affordance** is a property or feature of an object which presents a prompt on what can be done with this object.
+
+---
+
+# Talks that propose using structural typing instead of inheritance
+
 - [Better Code: Runtime Polymorphism - Sean Parent](https://www.youtube.com/watch?v=QGcVXgEVMJg&feature=youtu.be)
-- [Simon Brand: "How Rust gets polymorphism right"](https://www.youtube.com/watch?v=VSlBhAOLtFA)
 - [CppCon 2017: Louis Dionne “Runtime Polymorphism: Back to the Basics”](https://www.youtube.com/watch?v=gVGtNFg4ay0)
 - [Mathieu Ropert: Polymorphic ducks](https://mropert.github.io/2017/11/30/polymorphic_ducks/)
 - [CppCon 2019: John Bandela “Polymorphism != Virtual: Easy, Flexible Runtime Polymorphism Without Inheritance”](https://www.youtube.com/watch?v=PSxo85L2lC0&list=PLHTh1InhhwT6KhvViwRiTR7I5s09dLCSw&index=115&t=0s)
+
 ---
 
 <CodeSurfer>
 
-```cpp title="Structure typing" subtitle="C++ Concept"
+```cpp title="Structural typing" subtitle="C++ Concept"
 template<typename T>
 concept Hitable = requires(T s) {
     { s.bounding_box() } -> std::same_as<AABB>;
@@ -313,7 +349,7 @@ concept Hitable = requires(T s) {
 };
 ```
 
-```cpp 2[1:7] title="Structure typing" subtitle="Not real C++"
+```cpp 2[1:7] title="Structural typing" subtitle="Not real C++"
 template<typename T>
 virtual concept Hitable = requires(T s) {
     { s.bounding_box() } -> std::same_as<AABB>;
@@ -330,14 +366,28 @@ virtual concept Hitable = requires(T s) {
 
 ---
 
+# Runtime is a lot more complicated than compile time
+
+<ul>
+  <Appear>
+    <li>value vs reference semantics</li>
+    <li>ownership</li>
+    <li>small buffer optimization</li>
+  </Appear>
+</ul>
+
+---
+
 # Affordance of `Shape`
-- Destory
+
+- Destroy
 - `bounding_box`
 - `intersect`
 
 ---
 
-# Structure Typing In the Standard Library
+# Structural Typing In the Standard Library
+
 - `std::any`
 - `std::function`
 - `std::shared_ptr`
@@ -345,39 +395,54 @@ virtual concept Hitable = requires(T s) {
 ---
 
 # `std::any`
+
 - Is **not** a "safe replacement for `void*`"
-  - Owner vs non-owner
-  - "Type safety" cost
+- Owner vs non-owner
+- "Type safety" cost
 
 ---
 
 # `std::any` affordance
+
 - Copy
 - Move
-- Destory
+- Destroy
 - RTTI (`type`, `any_cast`)
+
+---
+
+# `std::function`
 
 ---
 
 <CodeSurfer>
 
 ```cpp title="Why we need std::function?" subtitle="Lambda in C++"
-class Lambda {
+struct Lambda {
   auto operator()(double a, double b) -> void {
-    return (std::abs(a) < std::abs(b));
+    return std::abs(a) < std::abs(b);
   }
 };
 ```
 
-``` cpp title="Why we need std::function?" subtitle="Lambda in some languages"
-class SadLambda : Function<bool<double, double>> {
+``` cpp title="Why we need std::function?" subtitle="Lambda in most languages"
+template <typename Signature>
+struct Function;
+
+template <typename R, typename... Args>
+struct Function<R(Args...)> {
+  virtual ~Function() = default;
+  virtual auto operator()(Args...) const -> R = 0;
+};
+
+struct SadLambda : Function<bool(double, double)> {
   auto operator()(double a, double b) const -> bool override {
     return (a < b);
   }
 };
 ```
 
-```diff 1[18:48],2[52:60] title="Why we need std::function?" subtitle="Those language already perform type erasure for you"
+```diff 6[2:9],7[2:9],10[18:49],11[52:60] title="Why we need std::function?" subtitle="Those languages already perform type erasure"
 
 ```
 
@@ -386,54 +451,1089 @@ class SadLambda : Function<bool<double, double>> {
 ---
 
 # `std::function` affordance
+
 - Copy
 - Move
 - Invoke
-- Destory
+- Destroy
 - RTTI (`target_type`)
 
 ---
 
 # `unique_function`: A better `function`
+
 - [P0228R3 "`unique_function`: a move-only std::function"](https://wg21.link/p0228)
-- Don't require functions to be copyable
+- Doesn't require functions to be copyable
 - Fix the [`const`-correctness bug](https://lesleylai.info/en/const-correcness-std-function/) in `std::function`
 
 ---
 
 # `unique_function` affordance
+
 - ~~Copy~~
 - Move
 - Invoke
-- Destory
+- Destroy
 - ~~RTTI~~
 
 ---
 
 # Implementing `unique_function`
-Finally, some real code!
+
+Finally, some "real" code!
 
 ---
 
-# General purpose libraries for type erasure
-
-* [Adobe.Poly](http://stlab.adobe.com/group__poly__related.html)
-* [Boost.TypeErasure](https://www.boost.org/doc/libs/1_66_0/doc/html/boost_typeerasure.html)
-* [Folly.Poly](https://github.com/facebook/folly/blob/master/folly/docs/Poly.md)
-* [Dyno](https://github.com/ldionne/dyno)
-* [polymorphic.hpp](https://github.com/google/cpp-from-the-sky-down/blob/master/metaprogrammed_polymorphism/polymorphic.hpp)
-* [\[Boost\].TE](https://github.com/boost-experimental/te)
+# `unique_function` Version 1
 
 ---
 
-# Things to consider before picking a library
-* Are they actively maintained?
-* value vs reference semantics
-* SBO
+<CodeSurfer>
+
+```cpp 3:7 title="Implementing with virtual functions" subtitle="Base class declares polymorphic operations"
+template <typename Signature> class unique_function;
+
+template <typename R, typename... Args> struct unique_function_storage_base {
+  virtual ~unique_function_storage_base() = default;
+
+  virtual auto invoke(Args&&... args) -> R = 0;
+};
+
+template <typename Func, typename R, typename... Args>
+struct unique_function_storage : unique_function_storage_base<R, Args...> {
+  Func wrapped;
+
+  using base_type = unique_function_storage_base<R, Args...>;
+
+  template <typename... A>
+  unique_function_storage(A&&... args) : wrapped{std::forward<A>(args)...}
+  {
+  }
+
+  auto invoke(Args&&... args) -> R final
+  {
+    return wrapped(std::forward<Args>(args)...);
+  }
+};
+
+template <typename R, typename... Args> class unique_function<R(Args...)> {
+  std::unique_ptr<unique_function_storage_base<R, Args...>> storage_ = nullptr;
+
+public:
+  constexpr unique_function() noexcept = default;
+  explicit constexpr unique_function(std::nullptr_t) noexcept {}
+
+  template <
+      typename Func, typename DFunc = std::decay_t<Func>,
+      typename = std::enable_if_t<!std::is_same_v<DFunc, unique_function>>>
+  explicit unique_function(Func&& value)
+      : storage_{std::make_unique<unique_function_storage<DFunc, R, Args...>>(
+            std::forward<Func>(value))}
+  {
+  }
+
+  auto operator()(Args&&... args) const -> R
+  {
+    if (storage_) {
+      return storage_->invoke(std::forward<Args>(args)...);
+    }
+    throw std::bad_function_call{};
+  }
+
+  auto swap(unique_function& rhs) noexcept -> void
+  {
+    storage_.swap(rhs.storage_);
+  }
+  
+  explicit operator bool() const noexcept
+  {
+    return storage_ != nullptr;
+  }
+
+  friend auto operator==(const unique_function& f, std::nullptr_t) noexcept -> bool
+  {
+    return !f;
+  }
+
+  friend auto operator==(std::nullptr_t, const unique_function& f) noexcept -> bool
+  {
+    return !f;
+  }
+
+  friend auto operator!=(const unique_function& f, std::nullptr_t) noexcept -> bool
+  {
+    return bool(f);
+  }
+
+  friend auto operator!=(std::nullptr_t, const unique_function& f) noexcept -> bool
+  {
+    return bool(f);
+  }
+
+  friend auto swap(unique_function& lhs, unique_function& rhs) noexcept -> void
+  {
+    lhs.swap(rhs);
+  }
+};
+```
+
+```diff 9:24 title="Implementing with virtual functions" subtitle="derived class template stores data and defines polymorphic behaviors"
+```
+
+```diff 9[49:53],15[25] title="Implementing with virtual functions" subtitle="Some lousy naming convensions: Args for function paramter types and A for constructor paramter types"
+```
+
+```diff 15:18 title="Implementing with virtual functions" subtitle="The constructor just forward arguments to construct the wrapped function object"
+```
+
+```diff 20:23 title="Implementing with virtual functions" subtitle="and the \"invoke\" member function invokes the wrapped function object"
+```
+
+```diff 25:49 title="The main unique_function class"
+```
+
+```diff 26 title="The main unique_function class" subtitle="Specialized on the R(Args...) type"
+```
+
+```diff 27 title="The main unique_function class" subtitle="The storage is stored as a pointer to base class"
+```
+
+```diff 30:31 title="The main unique_function class" subtitle="Default & empty constructors"
+```
+
+```diff 33:40 title="The main unique_function class" subtitle="Constructor by function object"
+```
+
+```diff 34:35 title="The main unique_function class" subtitle="SFINAE to make the Overload Resolution favor move constructor"
+```
+
+```diff 42:48 title="The main unique_function class" subtitle="The operator() forwards to storage if it exist"
+```
+
+```diff 50:83 title="The main unique_function class" subtitle="Not so important operations"
+```
+
+</CodeSurfer>
+
+---
+
+# I omit the deduction guides
+
+- Not useful for our discussion
+- **Very hard** to implement
+
+---
+
+# `unique_function` Version 2
+
+---
+
+# What about the const-correctness bug?
+
+```cpp
+const unique_function<int()> f {
+  [x=0]() mutable { return ++x; }
+};
+f(); // 1
+f(); // 2
+```
+
+---
+
+<CodeSurfer>
+
+```cpp title="Prevous Version"
+template <typename R, typename... Args> class unique_function<R(Args...)> {
+  std::unique_ptr<unique_function_storage_base<R, Args...>> storage_ = nullptr;
+
+public:
+  constexpr unique_function() noexcept = default;
+  explicit constexpr unique_function(std::nullptr_t) noexcept {}
+
+  template <
+      typename Func, typename DFunc = std::decay_t<Func>,
+      typename = std::enable_if_t<!std::is_same_v<DFunc, unique_function>>>
+  explicit unique_function(Func&& value)
+      : storage_{std::make_unique<unique_function_storage<DFunc, R, Args...>>(
+            std::forward<Func>(value))}
+  {
+  }
+
+  auto operator()(Args&&... args) const -> R
+  {
+    if (storage_) {
+      return storage_->invoke(std::forward<Args>(args)...);
+    }
+    throw std::bad_function_call{};
+  }
+
+  // Unimportant functions ...
+};
+```
+
+```cpp title="New base class"
+template <typename R, typename... Args> class unique_function_base {
+  std::unique_ptr<unique_function_storage_base<R, Args...>> storage_ = nullptr;
+
+protected:
+  constexpr unique_function_base() noexcept = default;
+
+  template <typename Func, typename DFunc = std::decay_t<Func>
+            typename = std::enable_if_t<!std::is_same_v<DFunc, unique_function_base> &&
+                                     std::is_move_constructible_v<DFunc>>>
+  unique_function_base(Func&& func)
+      : storage_{std::make_unique<unique_function_storage<DFunc, R, Args...>>(
+            std::forward<Func>(func))}
+  {
+  }
+
+  auto invoke(Args&&... args) const -> R
+  {
+    if (this->storage_) {
+      return this->storage_->invoke(std::forward<Args>(args)...);
+    }
+    throw std::bad_function_call{};
+  }
+
+public:
+  // Unimportant functions ...
+};
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```cpp title="Non-const Derived Class"
+template <typename R, typename... Args>
+class unique_function<R(Args...)>
+    : public unique_function_base<R, Args...> {
+public:
+  using base_type = unique_function_base<R, Args...>;
+
+  constexpr unique_function() = default;
+  explicit constexpr unique_function(std::nullptr_t) noexcept {}
+
+  template <typename Func, class DFunc = std::decay_t<Func>,
+            typename = std::enable_if_t<!std::is_same_v<DFunc, unique_function> &&
+                                     std::is_move_constructible_v<DFunc>>>
+  explicit unique_function(Func&& func) : base_type{std::forward<Func>(func)}
+  {
+  }
+
+  /*implicit*/ unique_function(unique_function<R(Args...) const>&& other)
+      : base_type{static_cast<base_type&&>(other)}
+  {
+  }
+
+  auto operator()(Args&&... args) -> R
+  {
+    return this->invoke(std::forward<Args>(args)...);
+  }
+};
+```
+
+``` diff 22 title="Non-const Derived Class" subtitle="Notice the lack of const"
+
+```
+
+``` diff 13[43:78],24[12:52] title="Non-const Derived Class" subtitle="Forward construction and invocation to base class"
+
+```
+
+``` diff 16:18 title="Non-const Derived Class" subtitle="Implicit conversion to const version"
+
+```
+
+``` cpp title="Const Derived Class"
+template <typename R, typename... Args>
+class unique_function<R(Args...) const>
+    : public unique_function_base<R, Args...> {
+public:
+  using base_type = unique_function_base<R, Args...>;
+
+  constexpr unique_function() = default;
+  explicit constexpr unique_function(std::nullptr_t) noexcept {}
+
+  template <
+      typename Func, typename DFunc = std::decay_t<Func>,
+      typename = std::enable_if_t<!std::is_same_v<DFunc, unique_function> &&
+                                  std::is_move_constructible_v<DFunc>>,
+      typename = std::void_t<
+          decltype(std::declval<const Func&>()(std::declval<Args>()...))>>
+  explicit unique_function(Func&& func) : base_type{std::forward<Func>(func)}
+  {
+  }
+
+  auto operator()(Args&&... args) const -> R
+  {
+    return this->invoke(std::forward<Args>(args)...);
+  }
+};
+```
+
+``` diff 20 title="Const Derived Class" subtitle="const is back"
+
+```
+
+``` diff 14:15 title="Const Derived Class" subtitle="Test if the underlying object is invocable when under const modifier"
+
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```cpp title="Result"
+// Does not compile
+unique_function<int() const> f1 {[x=0]() mutable { return ++x; }};
+
+const unique_function<int()> f2 {[x=0]() mutable { return ++x; }};
+f2(); // Does not compile
+```
+
+</CodeSurfer>
+
+---
+
+# Virtual dispatch implementation
+
+<ul>
+  <Appear>
+    <li>Simple</li>
+    <li>Everything is on the heap</li>
+    <li>No SBO</li>
+    <li>Still murdering inlining</li>
+  </Appear>
+</ul>
+
+---
+
+# `unique_function` Version 3
+
+---
+
+# Put more data on the stack
+
+- Create our own v-table!
+
+---
+
+# v-table is a bunch of function pointers
+
+---
+
+<CodeSurfer>
+
+``` cpp title="Our own v-table"
+  template <typename R, typename... Args> struct behaviors {
+    R (*invoke_ptr) (unique_function_storage& storage, Args&&... args) = nullptr;
+    void (*destroy_ptr) (unique_function_storage& storage) = nullptr;
+
+    template <typename Func> static auto create()
+    {
+      return behaviors{
+          .invoke_ptr =
+              +[](unique_function_storage& storage, Args&&... args) {
+                return (*static_cast<Func*>(storage.data))(
+                    std::forward<Args>(args)...);
+              },
+          .destroy_ptr =
+              +[](unique_function_storage& storage) {
+                delete static_cast<Func*>(storage.data);
+              }};
+    }
+  };
+```
+
+```diff 2:3 title="Our own v-table" subtitle="A struct of function pointers"
+```
+
+```diff 5:17 title="Our own v-table" subtitle="A factory function to help creating the struct"
+```
+
+```diff 8:16 title="Our own v-table" subtitle="I used C++20 designated initializer"
+```
+
+```diff 10:11,11,15[17:56] title="Our own v-table" subtitle="We cast the void* back to its original type and then use it"
+```
+
+```diff 9[15],14[15] title="Our own v-table" subtitle="The \"+\" cast captureless lambda to function pointers"
+```
+
+```cpp 1:9 title="Our new storage"
+struct unique_function_storage {
+  void* data = nullptr;
+
+  unique_function_storage() = default;
+
+  template <typename Func, typename... A> auto emplace(A&&... args)
+  {
+    data = new Func(std::forward<A>(args)...);
+  }
+
+  template <typename R, typename... Args> struct behaviors {
+    R(*invoke_ptr) (unique_function_storage& storage, Args&&... args) = nullptr;
+    void (*destroy_ptr)(unique_function_storage& storage) = nullptr;
+
+    template <typename Func> static auto create()
+    {
+      return behaviors{
+          .invoke_ptr =
+              +[](unique_function_storage& storage, Args&&... args) {
+                return (*static_cast<Func*>(storage.data))(
+                    std::forward<Args>(args)...);
+              },
+          .destroy_ptr =
+              +[](unique_function_storage& storage) {
+                delete static_cast<Func*>(storage.data);
+              }};
+    }
+  };
+};
+```
+
+```diff 2 title="Our new storage" subtitle="Store data into void*"
+```
+
+```diff title="Our new storage" subtitle="Notice that it is not a template"
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```cpp 2:3 title="The base class" subtitle="The unique_function_base now store the v-table explicit"
+template <typename R, typename... Args> class unique_function_base {
+  unique_function_storage storage_;
+  unique_function_storage::behaviors<R, Args...> behaviors_;
+
+protected:
+  constexpr unique_function_base() noexcept = default;
+
+  template <
+      typename Func, typename DFunc = std::decay_t<Func>,
+      class = std::enable_if_t<!std::is_same_v<DFunc, unique_function_base> &&
+                               std::is_move_constructible_v<DFunc>>>
+  unique_function_base(Func&& func)
+  {
+    storage_.template emplace<DFunc>(std::forward<DFunc>(func));
+    behaviors_ = decltype(behaviors_)::template create<Func>();
+  }
+
+  auto invoke(Args&&... args) const -> R
+  {
+    if (behaviors_.invoke_ptr != nullptr) {
+      return behaviors_.invoke_ptr(this->storage_, std::forward<Args>(args)...);
+    }
+    throw std::bad_function_call{};
+  }
+
+  auto reset()
+  {
+    if (behaviors_.destroy_ptr) {
+      behaviors_.destroy_ptr(storage_);
+    }
+    behaviors_ = {};
+  }
+
+public:
+  unique_function_base(const unique_function_base&) = delete;
+  auto operator=(const unique_function_base&) & -> unique_function_base& = delete;
+
+  unique_function_base(unique_function_base&& other) noexcept
+      : storage_{std::exchange(other.storage_, {})},
+        behaviors_{std::exchange(other.behaviors_, {})}
+  {
+  }
+
+  ~unique_function_base()
+  {
+    reset();
+  }
+
+  auto operator=(unique_function_base&& rhs) & noexcept -> unique_function_base&
+  {
+    // No guard against self-assignment
+    reset();
+    storage_ = std::exchange(rhs.storage_, {});
+    behaviors_ = std::exchange(rhs.behaviors_, {});
+    return *this;
+  }
+
+  auto swap(unique_function_base& rhs) noexcept -> void
+  {
+    using std::swap;
+    swap(storage_, rhs.storage_);
+    swap(behaviors_, rhs.behaviors_);
+  }
+
+  explicit operator bool() const noexcept
+  {
+    return behaviors_.invoke_ptr != nullptr;
+  }
+
+  friend auto operator==(const unique_function_base& f, std::nullptr_t) noexcept
+      -> bool
+  {
+    return !f;
+  }
+
+  friend auto operator==(std::nullptr_t, const unique_function_base& f) noexcept
+      -> bool
+  {
+    return !f;
+  }
+
+  friend auto operator!=(const unique_function_base& f, std::nullptr_t) noexcept
+      -> bool
+  {
+    return bool(f);
+  }
+
+  friend auto operator!=(std::nullptr_t, const unique_function_base& f) noexcept
+      -> bool
+  {
+    return bool(f);
+  }
+
+  friend auto swap(unique_function_base& lhs,
+                   unique_function_base& rhs) noexcept -> void
+  {
+    lhs.swap(rhs);
+  }
+};
+```
+
+```diff 14:15 title="The base class" subtitle="The constructor calls helpers"
+```
+
+```diff 21[14:34] title="The base class" subtitle="We invoke the pointers in the behaviors_ member to perform polymorphic behaviors"
+```
+
+```diff 26:32 title="The base class" subtitle="Since we no longer use unique_ptr, we need to handle lifetime ourselves"
+```
+
+```diff 35:57 title="The base class" subtitle="Since we no longer use unique_ptr, we need to handle lifetime ourselves"
+```
+
+```diff 39:40,53:54 title="The base class" subtitle="std::exchange is a great idiom to implement moves"
+```
+
+```diff 36[47],49[46] title="The base class" subtitle="The & prevents assigning to r-value, see p1906"
+```
+
+</CodeSurfer>
+
+---
+
+# `unique_function` Version 4
+
+---
+
+# Now we are ready to add Small Buffer Optimization!
+
+---
+
+<CodeSurfer>
+
+```cpp 1:9 title="Current storage"
+struct unique_function_storage {
+  void* data = nullptr;
+
+  unique_function_storage() = default;
+
+  template <typename Func, typename... A> auto emplace(A&&... args)
+  {
+    data = new Func(std::forward<A>(args)...);
+  }
+
+  template <typename R, typename... Args> struct behaviors {
+    R(*invoke_ptr) (unique_function_storage& storage, Args&&... args) = nullptr;
+    void (*destroy_ptr)(unique_function_storage& storage) = nullptr;
+
+    template <typename Func> static auto create()
+    {
+      return behaviors{
+          .invoke_ptr =
+              +[](unique_function_storage& storage, Args&&... args) {
+                return (*static_cast<Func*>(storage.data))(
+                    std::forward<Args>(args)...);
+              },
+          .destroy_ptr =
+              +[](unique_function_storage& storage) {
+                delete static_cast<Func*>(storage.data);
+              }};
+    }
+  };
+};
+```
+
+```cpp 1:18 title="New storage"
+template <std::size_t small_size> union unique_function_storage {
+  void* large = nullptr;
+  alignas(small_size) std::byte small[small_size];
+
+  template <class T>
+  static constexpr bool
+      fit_small = sizeof(T) <= sizeof(small) && small_size % alignof(T) == 0;
+
+  unique_function_storage() = default;
+
+  template <typename Func, typename... A> auto emplace(A&&... args)
+  {
+    if constexpr (fit_small<Func>) {
+      ::new (static_cast<void*>(&small)) Func(std::forward<A>(args)...);
+    } else {
+      large = new Func(std::forward<A>(args)...);
+    }
+  }
+
+  template <typename R, typename... Args> struct behaviors {
+    R (*invoke_ptr) (unique_function_storage& storage, Args&&... args) = nullptr;
+    void (*destroy_ptr)(unique_function_storage& storage) = nullptr;
+
+    template <typename Func> static auto create()
+    {
+      return behaviors{
+          .invoke_ptr =
+              +[](unique_function_storage& storage, Args&&... args) {
+                const auto data = fit_small<Func>
+                                      ? static_cast<void*>(&storage.small)
+                                      : static_cast<void*>(storage.large);
+
+                return (*static_cast<Func*>(data))(std::forward<Args>(args)...);
+              },
+          .destroy_ptr =
+              +[](unique_function_storage& storage) {
+                if constexpr (fit_small<Func>) {
+                  static_cast<Func*>(static_cast<void*>(&storage.small))
+                      ->~Func();
+                } else {
+                  delete static_cast<Func*>(storage.large);
+                }
+              }};
+    }
+  };
+};
+```
+
+```diff 1[34:39],2:3 title="New storage" subtitle="The storage is now an untagged union"
+```
+
+```diff 5:7 title="New storage" subtitle="A meta-function on whether the Func type fit the small buffer"
+```
+
+```diff 11:18 title="New storage" subtitle="Operations need now to dispatch on whether the SBO is used"
+```
+
+```diff 27:43 title="New storage" subtitle="Operations need now to dispatch on whether the SBO is used"
+```
+
+</CodeSurfer>
+
+---
+
+# Are we done with this implementation?
+
+<ul>
+<Appear>
+<li>No.</li>
+<li>But it works most of the time.</li>
+</Appear>
+</ul>
+
+---
+
+# Trivially Relocatable
+
+- [P1144R4: Object relocation in terms of move plus destroy](https://wg21.link/p1144)
+- For "trivially relocatable" object, move can be implemented as "relocate" -- a shallow `memcopy`
+- Not all the types are trivially relocatable
+
+---
+
+<CodeSurfer>
+
+```cpp 2:3 title="Previous behaviors"
+  template <typename R, typename... Args> struct behaviors {
+    R (*invoke_ptr) (unique_function_storage& storage, Args&&... args) = nullptr;
+    void (*destroy_ptr)(unique_function_storage& storage) = nullptr;
+
+    template <typename Func> static auto create()
+    {
+      return behaviors{
+          .invoke_ptr =
+              +[](unique_function_storage& storage, Args&&... args) {
+                const auto data = fit_small<Func>
+                                      ? static_cast<void*>(&storage.small)
+                                      : static_cast<void*>(storage.large);
+
+                return (*static_cast<Func*>(data))(std::forward<Args>(args)...);
+              },
+          .destroy_ptr =
+              +[](unique_function_storage& storage) {
+                if constexpr (fit_small<Func>) {
+                  static_cast<Func*>(static_cast<void*>(&storage.small))
+                      ->~Func();
+                } else {
+                  delete static_cast<Func*>(storage.large);
+                }
+              }};
+    }
+  };
+```
+
+```cpp 4:5 title="Adds a move operation" subtitle="A new function pointer for moves"
+  template <typename R, typename... Args> struct behaviors {
+    R (*invoke_ptr) (unique_function_storage& storage, Args&&... args) = nullptr;
+    void (*destroy_ptr)(unique_function_storage& storage) = nullptr;
+    void (*move_ptr)(unique_function_storage& from,
+                     unique_function_storage& to) noexcept = nullptr;
+
+    template <typename Func> static auto create()
+    {
+      return behaviors{
+          .invoke_ptr =
+              +[](unique_function_storage& storage, Args&&... args) {
+                const auto data = fit_small<Func>
+                                      ? static_cast<void*>(&storage.small)
+                                      : static_cast<void*>(storage.large);
+
+                return (*static_cast<Func*>(data))(std::forward<Args>(args)...);
+              },
+          .destroy_ptr =
+              +[](unique_function_storage& storage) {
+                if constexpr (fit_small<Func>) {
+                  static_cast<Func*>(static_cast<void*>(&storage.small))
+                      ->~Func();
+                } else {
+                  delete static_cast<Func*>(storage.large);
+                }
+              },
+          .move_ptr =
+              +[](unique_function_storage& from, unique_function_storage& to) noexcept {
+                if constexpr (fit_small<Func>) {
+                  ::new (static_cast<void*>(&to.small))
+                      Func(reinterpret_cast<Func&&>(from.small));
+                } else {
+                  to.large = std::exchange(from.large, nullptr);
+                }
+            }};
+  };
+```
+
+```diff 27:35 title="Adds a move operation" subtitle="which invokes the correct move constructor of the original Func type"
+```
+
+```cpp 7[6:17,77:79],8 title="Adds a move operation"
+template <std::size_t small_size> union unique_function_storage {
+  void* large = nullptr;
+  std::byte small[small_size];
+
+  template <class T>
+  static constexpr bool
+      fit_small = sizeof(T) <= sizeof(small) && small_size % alignof(T) == 0 &&
+                  std::is_nothrow_move_constructible_v<T>;
+
+  unique_function_storage() = default;
+
+  template <typename Func, typename... A> auto emplace(A&&... args)
+  {
+    if constexpr (fit_small<Func>) {
+      ::new (static_cast<void*>(&small)) Func(std::forward<A>(args)...);
+    } else {
+      large = new Func(std::forward<A>(args)...);
+    }
+  }
+
+  template <typename R, typename... Args> struct behaviors {
+    R (*invoke_ptr) (unique_function_storage& storage, Args&&... args) = nullptr;
+    void (*destroy_ptr)(unique_function_storage& storage) = nullptr;
+    void (*move_ptr)(unique_function_storage& from,
+                     unique_function_storage& to) noexcept = nullptr;
+
+    template <typename Func> static auto create()
+    {
+      return behaviors{
+          .invoke_ptr =
+              +[](unique_function_storage& storage, Args&&... args) {
+                const auto data = fit_small<Func>
+                                      ? static_cast<void*>(&storage.small)
+                                      : static_cast<void*>(storage.large);
+
+                return (*static_cast<Func*>(data))(std::forward<Args>(args)...);
+              },
+          .destroy_ptr =
+              +[](unique_function_storage& storage) {
+                if constexpr (fit_small<Func>) {
+                  static_cast<Func*>(static_cast<void*>(&storage.small))
+                      ->~Func();
+                } else {
+                  delete static_cast<Func*>(storage.large);
+                }
+              },
+          .move_ptr =
+              +[](unique_function_storage& from, unique_function_storage& to) noexcept {
+                if constexpr (fit_small<Func>) {
+                  ::new (static_cast<void*>(&to.small))
+                      Func(reinterpret_cast<Func&&>(from.small));
+                } else {
+                  to.large = std::exchange(from.large, {});
+                }
+            }};
+    }
+  };
+};
+```
+
+</CodeSurfer>
+
+---
+
+<CodeSurfer>
+
+```cpp 3:6,13:16 title="The updated move operations"
+  unique_function_base(unique_function_base&& other) noexcept
+  {
+    if (other) {
+      other.behaviors_.move_ptr(other.storage_, storage_);
+      behaviors_ = std::exchange(other.behaviors_, {});
+    }
+  }
+
+  auto operator=(unique_function_base&& rhs) & noexcept -> unique_function_base&
+  {
+    // No guard against self-assignment
+    reset();
+    if (rhs) {
+      rhs.behaviors_.move_ptr(rhs.storage_, storage_);
+      behaviors_ = std::exchange(rhs.behaviors_, {});
+    }
+    return *this;
+  }
+```
+
+</CodeSurfer>
+
+---
+
+# `unique_function` Version 5
+
+---
+
+# We don't need to store our v-table on the stack!
+
+---
+
+<CodeSurfer>
+
+```cpp 7[29:55],9[6:34],35 title="Behaviors become singletons"
+  template <typename R, typename... Args> struct behaviors {
+    R (*invoke_ptr) (unique_function_storage& storage, Args&&... args) = nullptr;
+    void (*destroy_ptr)(unique_function_storage& storage) = nullptr;
+    void (*move_ptr)(unique_function_storage& from,
+                     unique_function_storage& to) = nullptr;
+
+    template <typename Func> static auto get_instance()
+    {
+      static constexpr behaviors b{
+          .invoke_ptr =
+              +[](unique_function_storage& storage, Args&&... args) {
+                const auto data = fit_small<Func>
+                                      ? static_cast<void*>(&storage.small)
+                                      : static_cast<void*>(storage.large);
+                return (*static_cast<Func*>(data))(std::forward<Args>(args)...);
+              },
+          .destroy_ptr =
+              +[](unique_function_storage& storage) {
+                if constexpr (fit_small<Func>) {
+                  static_cast<Func*>(static_cast<void*>(&storage.small))
+                      ->~Func();
+                } else {
+                  delete static_cast<Func*>(storage.large);
+                }
+              },
+          .move_ptr =
+              +[](unique_function_storage& from, unique_function_storage& to) {
+                if constexpr (fit_small<Func>) {
+                  ::new (static_cast<void*>(&to.small))
+                      Func(reinterpret_cast<Func&&>(from.small));
+                } else {
+                  to.large = std::exchange(from.large, {});
+                }
+              }};
+      return &b;
+    }
+  };
+```
+
+```diff 7[4:28] title="Behaviors become singletons" subtitle="Dispatched by types"
+```
+
+```cpp 5:6 title="Changes inside unique_function_base" subtitle="Store as a pointer"
+template <typename R, typename... Args> class unique_function_base {
+  static constexpr std::size_t small_size = 32;
+
+  unique_function_storage<small_size> storage_;
+  const typename unique_function_storage<small_size>::template behaviors<
+      R, Args...>* behaviors_ = nullptr;
+
+protected:
+  constexpr unique_function_base() noexcept = default;
+
+  template <
+      typename Func, typename DFunc = std::decay_t<Func>,
+      typename = std::enable_if_t<!std::is_same_v<DFunc, unique_function_base> &&
+                               std::is_move_constructible_v<DFunc>>>
+  unique_function_base(Func&& func)
+  {
+    storage_.template emplace<DFunc>(std::forward<DFunc>(func));
+    behaviors_ =
+        typename unique_function_storage<small_size>::template behaviors<
+            R, Args...>::template get_instance<Func>();
+  }
+
+  auto invoke(Args&&... args) const -> R
+  {
+    if (behaviors_) {
+      return behaviors_->invoke_ptr(
+          this->storage_, std::forward<Args>(args)...);
+    }
+    throw std::bad_function_call{};
+  }
+
+  auto reset()
+  {
+    if (behaviors_) {
+      behaviors_->destroy_ptr(storage_);
+    }
+    behaviors_ = {};
+  }
+
+public:
+  unique_function_base(const unique_function_base&) = delete;
+  auto operator=(const unique_function_base&) & -> unique_function_base& = delete;
+
+  unique_function_base(unique_function_base&& other) noexcept
+  {
+    if (other) {
+      other.behaviors_->move_ptr(other.storage_, storage_);
+      behaviors_ = std::exchange(other.behaviors_, {});
+    }
+  }
+
+  ~unique_function_base()
+  {
+    reset();
+  }
+
+  auto operator=(unique_function_base&& rhs) & noexcept -> unique_function_base&
+  {
+    // No guard against self-assignment
+    reset();
+    if (rhs) {
+      rhs.behaviors_->move_ptr(rhs.storage_, storage_);
+      behaviors_ = std::exchange(rhs.behaviors_, {});
+    }
+    return *this;
+  }
+
+  auto swap(unique_function_base& rhs) noexcept -> void
+  {
+    using std::swap;
+    swap(storage_, rhs.storage_);
+    swap(behaviors_, rhs.behaviors_);
+  }
+
+  explicit operator bool() const noexcept
+  {
+    return behaviors_ != nullptr;
+  }
+
+  friend auto operator==(const unique_function_base& f, std::nullptr_t) noexcept
+      -> bool
+  {
+    return !f;
+  }
+
+  friend auto operator==(std::nullptr_t, const unique_function_base& f) noexcept
+      -> bool
+  {
+    return !f;
+  }
+
+  friend auto operator!=(const unique_function_base& f, std::nullptr_t) noexcept
+      -> bool
+  {
+    return bool(f);
+  }
+
+  friend auto operator!=(std::nullptr_t, const unique_function_base& f) noexcept
+      -> bool
+  {
+    return bool(f);
+  }
+
+  friend auto swap(unique_function_base& lhs,
+                   unique_function_base& rhs) noexcept -> void
+  {
+    lhs.swap(rhs);
+  }
+};
+```
+
+```diff 18:20 title="Changes inside unique_function_base" subtitle="Initialized by the get_instance function"
+```
+
+```diff 23[7:13],25:28 title="Changes inside unique_function_base" subtitle="We do need to pay one extra indirection"
+```
+
+```diff 32[7:12],34:37 title="Changes inside unique_function_base" subtitle="Some other machenical changes"
+```
+
+```diff 44,47 title="Changes inside unique_function_base" subtitle="Some other machenical changes"
+```
+
+```diff 57,62 title="Changes inside unique_function_base" subtitle="Some other machenical changes"
+```
+
+</CodeSurfer>
+
+---
+
+# My implementation of unique_function
+
+- [beyond::functions](https://github.com/Beyond-Engine/functions)
+- Better tested than my slideware before (I hope)
+
+---
+
+# General purpose libraries for structural typing
+
+- [Adobe.Poly](http://stlab.adobe.com/group__poly__related.html)
+- [Boost.TypeErasure](https://www.boost.org/doc/libs/1_66_0/doc/html/boost_typeerasure.html)
+- [Folly.Poly](https://github.com/facebook/folly/blob/master/folly/docs/Poly.md)
+- [Dyno](https://github.com/ldionne/dyno)
+- [polymorphic.hpp](https://github.com/google/cpp-from-the-sky-down/blob/master/metaprogrammed_polymorphism/polymorphic.hpp)
+- [\[Boost\].TE](https://github.com/boost-experimental/te)
 
 ---
 
 # Thank you!
+
+contacts:  
+[lesley@lesleylai.info](mailto:lesley@lesleylai.info)
+
+---
+
+# Questions?
 
 contacts:  
 [lesley@lesleylai.info](mailto:lesley@lesleylai.info)
